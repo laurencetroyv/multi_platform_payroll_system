@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const MainApp());
-}
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+import 'package:payroll_system/src/app.dart';
+import 'package:payroll_system/src/utils/dependency_injection.dart';
 
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
-      ),
-    );
-  }
+/// The main entry point of the application.
+/// Initializes Firebase and runs the main app.
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await DependencyInjection().initFirebase();
+
+  runApp(
+    const ProviderScope(child: MainApp()),
+  );
 }
