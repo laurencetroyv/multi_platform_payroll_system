@@ -1,6 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 
-import 'package:payroll_system/firebase_options.dart';
+import 'package:payroll_system/src/utils/firebase_options.dart';
 
 /// A class that handles dependency injection for the payroll system.
 class DependencyInjection {
