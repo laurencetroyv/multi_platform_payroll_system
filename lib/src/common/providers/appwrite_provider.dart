@@ -1,20 +1,25 @@
 import 'package:appwrite/appwrite.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:payroll_system/src/common/common.dart';
 
-final appwriteProvider = Provider<Client>((ref) {
+part 'appwrite_provider.g.dart';
+
+@riverpod
+Client client(ClientRef ref) {
   final client = Client();
   client.setEndpoint(EnvModel.endpoint).setProject(EnvModel.project);
   return client;
-});
+}
 
-final databaseProvider = Provider<Databases>((ref) {
-  final client = ref.read(appwriteProvider);
+@riverpod
+Databases databases(DatabasesRef ref) {
+  final client = ref.read(clientProvider);
   return Databases(client);
-});
+}
 
-final accountProvider = Provider<Account>((ref) {
-  final client = ref.read(appwriteProvider);
+@riverpod
+Account account(AccountRef ref) {
+  final client = ref.read(clientProvider);
   return Account(client);
-});
+}
