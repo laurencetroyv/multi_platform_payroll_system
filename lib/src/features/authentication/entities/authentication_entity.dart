@@ -25,7 +25,13 @@ class AuthenticationEntity {
 
   factory AuthenticationEntity.init() {
     return AuthenticationEntity(
-      isSignedIn: false,
+      isSignedIn: true,
+      user: UserEntity(
+        id: "id",
+        name: "Laurence Troy S. Valdez",
+        email: "laurencetroyv@gmail.com",
+        role: UserRoles.employer,
+      ),
     );
   }
 }

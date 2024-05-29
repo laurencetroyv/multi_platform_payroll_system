@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:payroll_system/src/features/authentication/authentication.dart';
-import 'package:payroll_system/src/features/authentication/entities/entities.dart';
-import 'package:payroll_system/src/features/authentication/providers/authentication_provider.dart';
 
 class SignUpBtn extends ConsumerWidget {
   const SignUpBtn(this.name, {super.key, required SignUpFormEntity form})

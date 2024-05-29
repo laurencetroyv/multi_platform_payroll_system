@@ -7,18 +7,32 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:payroll_system/src/common/common.dart';
 import 'package:payroll_system/src/features/authentication/authentication.dart';
-import 'package:payroll_system/src/features/authentication/entities/authentication_entity.dart';
 
-class AuthenticationProvider extends AsyncNotifier<AuthenticationEntity> {
+part 'authentication_provider.g.dart';
+
+@riverpod
+class Authentication extends _$Authentication {
   @override
-  AuthenticationEntity build() {
-    return AuthenticationEntity.init();
+  FutureOr<AuthenticationEntity> build() async {
+    state = const AsyncLoading();
+
+    final session = ref.read(readSessionProvider).value;
+
+    if (session != null && session.isNotEmpty) {
+      final user = await getUser(session);
+      state = AsyncData(user);
+      return user;
+    } else {
+      final user = AuthenticationEntity.init();
+      state = AsyncData(user);
+      return user;
+    }
   }
 
   Future<void> login(SignInFormEntity form) async {
     try {
       final account = ref.read(accountProvider);
-      final database = ref.read(databaseProvider);
+      final database = ref.read(databasesProvider);
 
       state = const AsyncLoading();
 
@@ -43,12 +57,12 @@ class AuthenticationProvider extends AsyncNotifier<AuthenticationEntity> {
         );
       }
 
-      state = AsyncData(AuthenticationEntity(
+      final authState = AuthenticationEntity(
         isSignedIn: true,
-        user: UserEntity.fromJson(
-          user.data,
-        ),
-      ));
+        user: UserEntity.fromJson(user.data),
+      );
+
+      state = AsyncData(authState);
     } on AppwriteException catch (e) {
       Exception(e.message);
     }
@@ -57,7 +71,7 @@ class AuthenticationProvider extends AsyncNotifier<AuthenticationEntity> {
   Future<bool> signUp(SignUpFormEntity form) async {
     try {
       final account = ref.read(accountProvider);
-      final database = ref.read(databaseProvider);
+      final database = ref.read(databasesProvider);
 
       final response = await account.create(
         userId: ID.unique(),
@@ -80,6 +94,26 @@ class AuthenticationProvider extends AsyncNotifier<AuthenticationEntity> {
     return false;
   }
 
+  Future<AuthenticationEntity> getUser(String session) async {
+    final account = ref.read(accountProvider);
+    final database = ref.read(databasesProvider);
+
+    final userSession = await account.getSession(sessionId: session);
+
+    final user = await database.getDocument(
+      databaseId: EnvModel.database,
+      collectionId: EnvModel.usersCollection,
+      documentId: userSession.userId,
+    );
+
+    final authState = AuthenticationEntity(
+      isSignedIn: true,
+      user: UserEntity.fromJson(user.data),
+    );
+
+    return authState;
+  }
+
   Future<void> logout() async {
     final secureStorage = ref.read(secureStorageProvider);
     final account = ref.read(accountProvider);
@@ -91,8 +125,3 @@ class AuthenticationProvider extends AsyncNotifier<AuthenticationEntity> {
     state = AsyncData(AuthenticationEntity(isSignedIn: false));
   }
 }
-
-final authenticationProvider =
-    AsyncNotifierProvider<AuthenticationProvider, AuthenticationEntity>(() {
-  return AuthenticationProvider();
-});
