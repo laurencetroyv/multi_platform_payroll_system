@@ -24,14 +24,6 @@ class AuthenticationEntity {
   }
 
   factory AuthenticationEntity.init() {
-    return AuthenticationEntity(
-      isSignedIn: true,
-      user: UserEntity(
-        id: "id",
-        name: "Laurence Troy S. Valdez",
-        email: "laurencetroyv@gmail.com",
-        role: UserRoles.employer,
-      ),
-    );
+    return AuthenticationEntity(isSignedIn: false);
   }
 }
