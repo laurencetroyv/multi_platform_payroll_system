@@ -84,7 +84,7 @@ class _AddEmployeeFormState extends ConsumerState<AddEmployeeForm> {
                   firstName: _nameController.text,
                   lastName: _nameController.text.split(' ').last,
                   address: _addressController.text,
-                  jobTitle: _jobPositionController.text,
+                  jobId: _jobPositionController.text,
                   status: true,
                 );
                 ref

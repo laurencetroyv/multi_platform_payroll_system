@@ -19,9 +19,8 @@ class _CompanyJobTableState extends ConsumerState<CompanyJobTable> {
     final employees = ref.watch(employeeControllerProvider);
     final positions = ref.watch(jobControllerProvider);
     final jobPositions = positions.map((job) {
-      final employee = employees
-          .where((employee) => employee.jobTitle == job.title)
-          .toList();
+      final employee =
+          employees.where((employee) => employee.jobId == job.id).toList();
       return {
         'job': job,
         'title': job.title,

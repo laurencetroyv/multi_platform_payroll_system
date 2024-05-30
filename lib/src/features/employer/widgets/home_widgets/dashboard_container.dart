@@ -16,7 +16,8 @@ class DashboardCardContainer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final jobController = ref.watch(jobControllerProvider).length;
     final paidController = ref.watch(paidControllerProvider).length;
-    final cashAdvanceController = ref.watch(cashAdvanceControllerProvider);
+    final cashAdvanceController =
+        ref.watch(cashAdvanceControllerProvider).length;
     final employeeController = ref.watch(employeeControllerProvider).length;
 
     return Row(

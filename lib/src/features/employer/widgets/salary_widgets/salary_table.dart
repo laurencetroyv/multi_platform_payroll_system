@@ -49,9 +49,8 @@ class _SalaryTableState extends ConsumerState<SalaryTable> {
                   DataColumn(label: Text('Action')),
                 ],
                 rows: employees.map((employee) {
-                  final salary = jobs
-                      .firstWhere((job) => job.title == employee.jobTitle)
-                      .monthlySalary;
+                  final job =
+                      jobs.firstWhere((job) => job.title == employee.id);
                   final now = DateTime.now();
                   final isPaid = paidEmployees
                       .where((paid) =>
@@ -63,8 +62,8 @@ class _SalaryTableState extends ConsumerState<SalaryTable> {
                     cells: [
                       DataCell(Text(employee.firstName)),
                       DataCell(Text(employee.lastName)),
-                      DataCell(Text(employee.jobTitle)),
-                      DataCell(Text(salary.toString())),
+                      DataCell(Text(job.title)),
+                      DataCell(Text(job.monthlySalary.toString())),
                       DataCell(Text(isPaid ? 'Paid' : 'Unpaid')),
                       DataCell(
                         FilledButton(

@@ -17,6 +17,7 @@ class _EmployeeTableState extends ConsumerState<EmployeeTable> {
   @override
   Widget build(BuildContext context) {
     final employees = ref.watch(employeeControllerProvider);
+    final jobs = ref.watch(jobControllerProvider);
 
     return Expanded(
       child: Center(
@@ -48,6 +49,8 @@ class _EmployeeTableState extends ConsumerState<EmployeeTable> {
                 ],
                 rows: employees.map((employee) {
                   final employeeDisable = employee.status == false;
+                  final jobName =
+                      jobs.where((job) => job.id == employee.jobId).first;
 
                   return DataRow(
                     cells: [
@@ -55,7 +58,7 @@ class _EmployeeTableState extends ConsumerState<EmployeeTable> {
                       DataCell(Text(employee.firstName)),
                       DataCell(Text(employee.lastName)),
                       DataCell(Text(employee.address)),
-                      DataCell(Text(employee.jobTitle)),
+                      DataCell(Text(jobName.title)),
                       DataCell(Text(employee.status ? 'Active' : 'Inactive')),
                       DataCell(
                         FilledButton(
