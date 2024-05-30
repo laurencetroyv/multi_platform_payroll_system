@@ -5,12 +5,14 @@ class UserEntity {
   String name;
   String email;
   UserRoles role;
+  String? employeeId;
 
   UserEntity({
     required this.id,
     required this.name,
     required this.email,
     required this.role,
+    this.employeeId,
   });
 
   factory UserEntity.fromJson(Map<String, dynamic> json) {
@@ -24,6 +26,7 @@ class UserEntity {
       name: json['name'],
       email: json['email'],
       role: UserRoles.values[index],
+      employeeId: json['employeeId'],
     );
   }
 }
