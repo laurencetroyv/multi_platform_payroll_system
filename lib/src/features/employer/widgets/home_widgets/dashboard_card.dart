@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
-import 'package:payroll_system/src/features/employer/provider/employer_index.dart';
+import 'package:payroll_system/src/features/employer/employer.dart';
 
 class DashboardCard extends ConsumerWidget {
   const DashboardCard({
