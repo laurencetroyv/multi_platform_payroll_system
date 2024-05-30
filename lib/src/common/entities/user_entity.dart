@@ -5,18 +5,12 @@ class UserEntity {
   String name;
   String email;
   UserRoles role;
-  String? job;
-  String? monthlySalary;
-  bool? isPaid;
 
   UserEntity({
     required this.id,
     required this.name,
     required this.email,
     required this.role,
-    this.job,
-    this.monthlySalary,
-    this.isPaid,
   });
 
   factory UserEntity.fromJson(Map<String, dynamic> json) {
@@ -30,9 +24,6 @@ class UserEntity {
       name: json['name'],
       email: json['email'],
       role: UserRoles.values[index],
-      job: json['job'],
-      monthlySalary: json['monthlySalary'],
-      isPaid: json['isPaid'],
     );
   }
 }
