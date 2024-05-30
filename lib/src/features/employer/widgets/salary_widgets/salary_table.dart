@@ -50,7 +50,7 @@ class _SalaryTableState extends ConsumerState<SalaryTable> {
                 ],
                 rows: employees.map((employee) {
                   final job =
-                      jobs.firstWhere((job) => job.title == employee.id);
+                      jobs.firstWhere((job) => job.id == employee.jobId);
                   final now = DateTime.now();
                   final isPaid = paidEmployees
                       .where((paid) =>

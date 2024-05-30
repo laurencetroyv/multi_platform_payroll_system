@@ -78,13 +78,15 @@ class _AddEmployeeFormState extends ConsumerState<AddEmployeeForm> {
                   return;
                 }
 
+                final job = jobPositions[index];
+
                 final key = UniqueKey().toString();
                 final employee = EmployeeEntity(
                   id: key.substring(2, key.length - 1).toUpperCase(),
                   firstName: _nameController.text,
                   lastName: _nameController.text.split(' ').last,
                   address: _addressController.text,
-                  jobId: _jobPositionController.text,
+                  jobId: job.id,
                   status: true,
                 );
                 ref
