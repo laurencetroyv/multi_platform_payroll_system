@@ -10,7 +10,7 @@ import 'package:payroll_system/src/features/authentication/authentication.dart';
 
 part 'authentication_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class Authentication extends _$Authentication {
   @override
   FutureOr<AuthenticationEntity> build() async {
@@ -49,12 +49,8 @@ class Authentication extends _$Authentication {
 
       if ((kIsWeb || Platform.isWindows && form.saveSession == true) ||
           (Platform.isAndroid || Platform.isIOS)) {
-        final secureStorage = ref.read(secureStorageProvider);
-        secureStorage.delete(key: 'session');
-        secureStorage.write(
-          key: 'session',
-          value: response.$id,
-        );
+        ref.read(deleteSessionProvider('session'));
+        ref.read(setSessionProvider("session", response.$id));
       }
 
       final authState = AuthenticationEntity(

@@ -5,20 +5,20 @@ import 'package:payroll_system/src/common/common.dart';
 
 part 'appwrite_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 Client client(ClientRef ref) {
   final client = Client();
   client.setEndpoint(EnvModel.endpoint).setProject(EnvModel.project);
   return client;
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 Databases databases(DatabasesRef ref) {
   final client = ref.read(clientProvider);
   return Databases(client);
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 Account account(AccountRef ref) {
   final client = ref.read(clientProvider);
   return Account(client);
