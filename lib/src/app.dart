@@ -9,14 +9,35 @@ import 'package:payroll_system/src/common/common.dart';
 import 'package:payroll_system/src/features/authentication/authentication.dart';
 import 'package:payroll_system/src/routing/routes.dart';
 
-class MainApp extends ConsumerWidget {
+class MainApp extends ConsumerStatefulWidget {
   const MainApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends ConsumerState<MainApp> {
+  Map<String, Widget Function(BuildContext)> route = {
+    Routes.home: (context) => const LoadingWidget()
+  };
+
+  @override
+  Widget build(BuildContext context) {
     final authProvider = ref.watch(authenticationProvider);
     final gradient =
         kIsWeb || Platform.isWindows ? webGradient : mobileGradient;
+
+    authProvider.when(
+      data: (data) {
+        final userRole = data.user?.role;
+        final routes = Routes(signedIn: data.isSignedIn);
+        setState(() {
+          route = routes.getRoutes(type: userRole);
+        });
+      },
+      error: (error, stackTrace) {},
+      loading: () {},
+    );
 
     return SafeArea(
       child: MaterialApp(
@@ -26,24 +47,7 @@ class MainApp extends ConsumerWidget {
         darkTheme: ApplicationTheme().darkTheme,
         debugShowCheckedModeBanner: false,
         initialRoute: Routes.home,
-        routes: authProvider.when(
-          data: (data) {
-            final userRole = data.user?.role;
-            final routes = Routes(signedIn: data.isSignedIn);
-            return routes.getRoutes(type: userRole);
-          },
-          error: (error, stackTrace) {
-            return {
-              Routes.home: (context) =>
-                  ErrorWidgetComponent(error: error, stackTrace: stackTrace),
-            };
-          },
-          loading: () {
-            return {
-              Routes.home: (context) => const LoadingWidget(),
-            };
-          },
-        ),
+        routes: route,
         builder: (context, child) {
           return Container(
             decoration: BoxDecoration(gradient: gradient),
