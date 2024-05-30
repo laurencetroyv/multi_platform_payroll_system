@@ -51,3 +51,6 @@ firebase.json
 # Environment variables files
 env_model.g.dart
 .env
+
+# build_runner files
+*.g.dart
