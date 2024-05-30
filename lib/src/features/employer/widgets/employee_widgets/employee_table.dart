@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gap/gap.dart';
 
 import 'package:payroll_system/src/features/employer/employer.dart';
 
-class EmployeeTable extends ConsumerWidget {
+class EmployeeTable extends ConsumerStatefulWidget {
   const EmployeeTable({
     super.key,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<EmployeeTable> createState() => _EmployeeTableState();
+}
+
+class _EmployeeTableState extends ConsumerState<EmployeeTable> {
+  @override
+  Widget build(BuildContext context) {
     final employees = ref.watch(employeeControllerProvider);
+
     return Expanded(
       child: Center(
         child: Container(
@@ -33,6 +38,7 @@ class EmployeeTable extends ConsumerWidget {
                           color: Colors.black,
                         ),
                 columns: const [
+                  DataColumn(label: Text('ID')),
                   DataColumn(label: Text('First Name')),
                   DataColumn(label: Text('Last Name')),
                   DataColumn(label: Text('Address')),
@@ -41,40 +47,25 @@ class EmployeeTable extends ConsumerWidget {
                   DataColumn(label: Text('Action')),
                 ],
                 rows: employees.map((employee) {
+                  final employeeDisable = employee.status == false;
+
                   return DataRow(
                     cells: [
+                      DataCell(Text(employee.id)),
                       DataCell(Text(employee.firstName)),
                       DataCell(Text(employee.lastName)),
                       DataCell(Text(employee.address)),
                       DataCell(Text(employee.jobTitle)),
-                      DataCell(Text(employee.status)),
+                      DataCell(Text(employee.status ? 'Active' : 'Inactive')),
                       DataCell(
                         FilledButton(
                           onPressed: () {
                             ref
                                 .read(employeeControllerProvider.notifier)
-                                .removeEmployee(employee);
+                                .disableEmployee(employee);
+                            setState(() {});
                           },
-                          style: ButtonStyle(
-                            shape: WidgetStateProperty.all(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                            ),
-                            backgroundColor: WidgetStateProperty.all(
-                                const Color(0xFFF15042)),
-                            textStyle: WidgetStateProperty.all(
-                                const TextStyle(color: Colors.white)),
-                          ),
-                          child: const Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.minimize_rounded),
-                              Gap(4),
-                              Text('Disable'),
-                            ],
-                          ),
+                          child: Text(!employeeDisable ? 'Disable' : 'Enable'),
                         ),
                       ),
                     ],

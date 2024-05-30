@@ -21,7 +21,7 @@ class _AddEmployeeFormState extends ConsumerState<AddEmployeeForm> {
 
   @override
   Widget build(BuildContext context) {
-    final jobPositions = ref.read(jobControllerProvider);
+    final jobPositions = ref.watch(jobControllerProvider);
     return Form(
       key: _formKey,
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -59,20 +59,33 @@ class _AddEmployeeFormState extends ConsumerState<AddEmployeeForm> {
             enableFilter: true,
             hintText: "Job Title",
             dropdownMenuEntries: jobPositions
-                .map((position) =>
-                    DropdownMenuEntry(label: position, value: position))
+                .map((job) => DropdownMenuEntry(label: job.title, value: job))
                 .toList(),
           ),
           const Gap(16),
           FilledButton(
             onPressed: () {
               if (_formKey.currentState!.validate()) {
+                final index = jobPositions.indexWhere(
+                  (job) => job.title == _jobPositionController.text,
+                );
+                if (index == -1) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Job Position not found'),
+                    ),
+                  );
+                  return;
+                }
+
+                final key = UniqueKey().toString();
                 final employee = EmployeeEntity(
+                  id: key.substring(2, key.length - 1).toUpperCase(),
                   firstName: _nameController.text,
                   lastName: _nameController.text.split(' ').last,
                   address: _addressController.text,
                   jobTitle: _jobPositionController.text,
-                  status: 'Active',
+                  status: true,
                 );
                 ref
                     .read(employeeControllerProvider.notifier)
