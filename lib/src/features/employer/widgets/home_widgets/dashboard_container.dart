@@ -15,9 +15,9 @@ class DashboardCardContainer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final jobController = ref.watch(jobControllerProvider).length;
-    final paidController = ref.watch(paidControllerProvider);
+    final paidController = ref.watch(paidControllerProvider).length;
     final cashAdvanceController = ref.watch(cashAdvanceControllerProvider);
-    final employeeController = ref.watch(employeeControllerProvider);
+    final employeeController = ref.watch(employeeControllerProvider).length;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -48,8 +48,8 @@ class DashboardCardContainer extends ConsumerWidget {
           route: 4,
         ),
         DashboardCard(
-          amount: employeeController.length,
-          title: 'Total Employee${employeeController.length > 1 ? 's' : ''}',
+          amount: employeeController,
+          title: 'Total Employee${employeeController > 1 ? 's' : ''}',
           icon: 'assets/svgs/total_employees.svg',
           color: const Color(0xFFF41C58),
           footer: const Color(0xFFDD1730),
