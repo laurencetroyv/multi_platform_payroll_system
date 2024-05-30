@@ -1,19 +1,23 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import 'package:payroll_system/src/common/common.dart';
+
 part 'employee_controller.g.dart';
 
 @riverpod
 class EmployeeController extends _$EmployeeController {
   @override
-  int build() => 0;
+  List<EmployeeEntity> build() => [];
 
-  void addEmployee() {
-    state++;
+  void addEmployee(EmployeeEntity employee) {
+    if (!state.contains(employee)) {
+      state = [...state, employee];
+    }
   }
 
-  void removeEmployee() {
-    if (state > 0) {
-      state--;
+  void removeEmployee(EmployeeEntity employee) {
+    if (state.contains(employee)) {
+      state = state.where((employee) => employee != employee).toList();
     }
   }
 }
