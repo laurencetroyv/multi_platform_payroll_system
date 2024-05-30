@@ -1,19 +1,15 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import 'package:payroll_system/src/common/entities/cash_advance_entity.dart';
+
 part 'cash_advance_controller.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class CashAdvanceController extends _$CashAdvanceController {
   @override
-  int build() => 0;
+  List<CashAdvanceEntity> build() => [];
 
-  void addCashAdvanceEmployee() {
-    state++;
-  }
+  void addCashAdvanceEmployee() {}
 
-  void removeCashAdvanceEmployee() {
-    if (state > 0) {
-      state--;
-    }
-  }
+  void removeCashAdvanceEmployee() {}
 }
