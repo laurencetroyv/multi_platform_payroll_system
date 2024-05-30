@@ -48,8 +48,8 @@ class DashboardCardContainer extends ConsumerWidget {
           route: 4,
         ),
         DashboardCard(
-          amount: employeeController,
-          title: 'Total Employee${employeeController > 1 ? 's' : ''}',
+          amount: employeeController.length,
+          title: 'Total Employee${employeeController.length > 1 ? 's' : ''}',
           icon: 'assets/svgs/total_employees.svg',
           color: const Color(0xFFF41C58),
           footer: const Color(0xFFDD1730),
