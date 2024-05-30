@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
+import 'package:payroll_system/src/features/employer/provider/employer_index.dart';
 
 class DashboardCard extends ConsumerWidget {
   const DashboardCard({
@@ -12,7 +13,7 @@ class DashboardCard extends ConsumerWidget {
     required this.icon,
     required this.color,
     required this.footer,
-    this.route,
+    required this.route,
   });
 
   final int amount;
@@ -20,21 +21,13 @@ class DashboardCard extends ConsumerWidget {
   final String icon;
   final Color color;
   final Color footer;
-  final String? route;
+  final int route;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return InkWell(
       onTap: () {
-        if (route != null) {
-          Navigator.of(context).pushNamed(route!);
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('You found another secret feature! 🎉'),
-            ),
-          );
-        }
+        ref.read(employerIndexProvider.notifier).setIndex(route);
       },
       child: Container(
         color: color,
