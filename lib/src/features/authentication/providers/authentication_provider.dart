@@ -7,6 +7,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:payroll_system/src/common/common.dart';
 import 'package:payroll_system/src/features/authentication/authentication.dart';
+import 'package:payroll_system/src/features/employee/provider/employee_provider.dart';
 import 'package:payroll_system/src/features/employer/employer.dart';
 
 part 'authentication_provider.g.dart';
@@ -78,16 +79,32 @@ class Authentication extends _$Authentication {
             .read(paidControllerProvider.notifier)
             .fetchPaidEmployees(userEntity);
       } else {
+        final employeeIds = await getEmployeeIds();
+
+        final employeeId = employeeIds.firstWhere(
+          (element) => element.id == userEntity.employeeId,
+          orElse: () => EmployeeIds(id: '', employerId: '', reference: ''),
+        );
+
         final employee = await ref
             .read(employeeControllerProvider.notifier)
-            .getEmployee(userEntity.id);
+            .getEmployee(employeeId.reference);
+
+        ref.read(employeeProvider.notifier).setEmployee(employee);
 
         // fetch job of employee
         await ref
             .read(jobControllerProvider.notifier)
-            .fetchJobPositionEmployee(userEntity, employee: employee);
+            .fetchJobPositionEmployee(employee);
+
         // fetch cash advances of employee
+        await ref
+            .read(cashAdvanceControllerProvider.notifier)
+            .fetchCashAdvanceEmployeeEmployee(employee);
         // fetch paids of employee
+        await ref
+            .read(paidControllerProvider.notifier)
+            .fetchPaidEmployeesEmployee(employee);
       }
 
       ref.read(userControllerProvider.notifier).setUser(userEntity);
@@ -145,17 +162,21 @@ class Authentication extends _$Authentication {
   }
 
   Future<List<EmployeeIds>> getEmployeeIds() async {
-    final database = ref.read(databasesProvider);
+    try {
+      final database = ref.read(databasesProvider);
 
-    final response = await database.listDocuments(
-      databaseId: EnvModel.database,
-      collectionId: EnvModel.employeeIdsCollection,
-    );
+      final response = await database.listDocuments(
+        databaseId: EnvModel.database,
+        collectionId: EnvModel.employeeIdsCollection,
+      );
 
-    final employeeIds =
-        response.documents.map((e) => EmployeeIds.fromMap(e.data)).toList();
+      final employeeIds =
+          response.documents.map((e) => EmployeeIds.fromMap(e.data)).toList();
 
-    return employeeIds;
+      return employeeIds;
+    } on AppwriteException catch (e) {
+      throw Exception(e.message);
+    }
   }
 
   Future<void> logout() async {
