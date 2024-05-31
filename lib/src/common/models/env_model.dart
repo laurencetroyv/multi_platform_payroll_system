@@ -18,4 +18,16 @@ abstract class EnvModel {
 
   @EnviedField(varName: 'CASH_ADVANCE_COLLECTION', obfuscate: true)
   static final String cashAdvanceCollection = _EnvModel.cashAdvanceCollection;
+
+  @EnviedField(varName: 'JOB_POSITION_COLLECTION', obfuscate: true)
+  static final String jobPositionsCollection = _EnvModel.jobPositionsCollection;
+
+  @EnviedField(varName: 'EMPLOYEE_COLLECTION', obfuscate: true)
+  static final String employeeCollection = _EnvModel.employeeCollection;
+
+  @EnviedField(varName: 'PAYMENTS_COLLECTION', obfuscate: true)
+  static final String paymentsCollection = _EnvModel.paymentsCollection;
+
+  @EnviedField(varName: 'EMPLOYEE_IDS_COLLECTION', obfuscate: true)
+  static final String employeeIdsCollection = _EnvModel.employeeIdsCollection;
 }
