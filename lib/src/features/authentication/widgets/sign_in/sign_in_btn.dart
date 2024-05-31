@@ -13,26 +13,36 @@ class SignInBtn extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return FilledButton(
-      onPressed: () async {
-        try {
-          await ref.read(authenticationProvider.notifier).login(_form);
-          WidgetsFlutterBinding.ensureInitialized()
-              .addPostFrameCallback((timeStamp) {
-            Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
-          });
-        } catch (e) {
-          WidgetsFlutterBinding.ensureInitialized()
-              .addPostFrameCallback((timeStamp) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(e.toString()),
-              ),
-            );
-          });
-        }
-      },
-      child: Text(name),
-    );
+    final authProvider = ref.watch(authenticationProvider);
+    return authProvider.isLoading
+        ? const Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              CircularProgressIndicator(),
+            ],
+          )
+        : FilledButton(
+            onPressed: () async {
+              try {
+                await ref.read(authenticationProvider.notifier).login(_form);
+                WidgetsFlutterBinding.ensureInitialized()
+                    .addPostFrameCallback((timeStamp) {
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, '/', (route) => false);
+                });
+              } catch (e) {
+                WidgetsFlutterBinding.ensureInitialized()
+                    .addPostFrameCallback((timeStamp) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(e.toString()),
+                    ),
+                  );
+                });
+              }
+            },
+            child: Text(name),
+          );
   }
 }
