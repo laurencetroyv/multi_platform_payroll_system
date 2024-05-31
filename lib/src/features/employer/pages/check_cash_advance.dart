@@ -29,9 +29,9 @@ class _CheckCashAdvanceState extends ConsumerState<CheckCashAdvance> {
           ListView(
             shrinkWrap: true,
             children: cashAdvanced.map((ca) {
-              final employee = employees.where((e) => e.id == ca.id).first;
+              final employee =
+                  employees.where((e) => e.id == ca.employeeId).first;
               final job = jobs.where((j) => j.id == employee.jobId).first;
-              final name = '${employee.firstName} ${employee.lastName}';
 
               return ListTile(
                 contentPadding: const EdgeInsets.all(8),
@@ -40,16 +40,24 @@ class _CheckCashAdvanceState extends ConsumerState<CheckCashAdvance> {
                     '${employee.firstName[0].toUpperCase()}${employee.lastName[0].toUpperCase()}',
                   ),
                 ),
-                title: Text(name),
+                title: Text(employee.firstName),
                 subtitle: Text(
-                  '${job.title}, ₱${ca.amount}, ${DateFormat.yMMMd().format(ca.createdAt)}',
+                  '${job.title}, ${DateFormat.yMMMd().format(ca.createdAt)}',
                 ),
                 trailing: FilledButton(
                   onPressed: () async {
                     await showDialog(
                       context: context,
                       builder: (context) {
-                        return CashAdvanceDialog(ca);
+                        return Dialog(
+                          child: SizedBox(
+                            width: 500,
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: CashAdvanceDialog(ca),
+                            ),
+                          ),
+                        );
                       },
                     );
                     setState(() {});

@@ -5,6 +5,7 @@ class CashAdvanceEntity {
   final DateTime repaymentDate;
   final DateTime createdAt;
   final String employerId;
+  final String contactNumber;
 
   CashAdvanceEntity({
     required this.id,
@@ -13,26 +14,29 @@ class CashAdvanceEntity {
     required this.repaymentDate,
     required this.createdAt,
     required this.employerId,
+    required this.contactNumber,
   });
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
       'userId': employeeId,
-      'amount': amount,
-      'repaymentDate': repaymentDate,
+      'repaymentDate': repaymentDate.toIso8601String(),
       'employerId': employerId,
+      'amount': double.parse(amount),
+      'contactNumber': contactNumber,
     };
   }
 
   factory CashAdvanceEntity.fromMap(Map<String, dynamic> json) {
+    final repaymentDate = DateTime.parse(json['repaymentDate']);
     return CashAdvanceEntity(
-      id: json['id'],
+      id: json['\$id'],
       employeeId: json['userId'],
-      amount: json['amount'],
-      repaymentDate: json['repaymentDate'],
+      amount: "${json['amount']}",
+      repaymentDate: repaymentDate,
       createdAt: DateTime.parse(json['\$createdAt']),
       employerId: json['employerId'],
+      contactNumber: json['contactNumber'],
     );
   }
 }
