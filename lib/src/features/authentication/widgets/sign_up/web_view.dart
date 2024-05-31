@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,6 +27,9 @@ class _WebViewState extends ConsumerState<SignUpWebView> {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 400 ||
+        (Platform.isAndroid || Platform.isIOS);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -66,16 +71,17 @@ class _WebViewState extends ConsumerState<SignUpWebView> {
                       hintText: 'Enter your name',
                     ),
                   ),
-                  const Gap(16),
-                  TextFormField(
-                    autovalidateMode: AutovalidateMode.disabled,
-                    controller: widget._form.employeeId,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Employee ID',
-                      hintText: 'Employee ID must came from HR Department',
+                  if (isMobile) const Gap(16),
+                  if (isMobile)
+                    TextFormField(
+                      autovalidateMode: AutovalidateMode.disabled,
+                      controller: widget._form.employeeId,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Employee ID',
+                        hintText: 'Employee ID must came from HR Department',
+                      ),
                     ),
-                  ),
                   const Gap(16),
                   TextFormField(
                     controller: widget._form.emailController,
@@ -115,6 +121,7 @@ class _WebViewState extends ConsumerState<SignUpWebView> {
                         "Register",
                         form: widget._form,
                         ids: widget.ids,
+                        employer: true,
                       ),
                     ),
                   ),

@@ -12,11 +12,13 @@ class SignUpBtn extends ConsumerWidget {
     super.key,
     required SignUpFormEntity form,
     required this.ids,
+    required this.employer,
   }) : _form = form;
 
   final SignUpFormEntity _form;
   final String name;
   final List<EmployeeIds> ids;
+  final bool employer;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -32,29 +34,35 @@ class SignUpBtn extends ConsumerWidget {
           )
         : FilledButton(
             onPressed: () async {
-              final index = ids.indexWhere((element) => element.id == _form.id);
-              if (index == -1) {
-                WidgetsFlutterBinding.ensureInitialized()
-                    .addPostFrameCallback((_) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Invalid Employee ID'),
-                    ),
-                  );
-                });
-                return;
+              late final EmployeeEntity? employeeResponse;
+              if (!employer) {
+                final index =
+                    ids.indexWhere((element) => element.id == _form.id);
+                if (index == -1) {
+                  WidgetsFlutterBinding.ensureInitialized()
+                      .addPostFrameCallback((_) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Invalid Employee ID'),
+                      ),
+                    );
+                  });
+                  return;
+                }
+
+                final employee = ids[index];
+
+                employeeResponse = await ref
+                    .read(employeeControllerProvider.notifier)
+                    .getEmployee(employee.reference);
+              } else {
+                employeeResponse = null;
               }
-
-              final employee = ids[index];
-
-              final employeeResponse = await ref
-                  .read(employeeControllerProvider.notifier)
-                  .getEmployee(employee.reference);
 
               try {
                 final response = await ref
                     .read(authenticationProvider.notifier)
-                    .signUp(_form, name: employeeResponse.firstName);
+                    .signUp(_form, name: employeeResponse?.firstName);
                 if (response) {
                   WidgetsFlutterBinding.ensureInitialized()
                       .addPostFrameCallback((_) {

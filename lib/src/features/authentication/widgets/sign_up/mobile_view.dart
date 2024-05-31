@@ -97,7 +97,12 @@ class _MobileViewState extends ConsumerState<SignUpMobileView> {
             obscureText: !showPassword,
           ),
           const Gap(64),
-          SignUpBtn("\t\tSign up\t\t", form: widget._form, ids: widget.ids),
+          SignUpBtn(
+            "\t\tSign up\t\t",
+            form: widget._form,
+            ids: widget.ids,
+            employer: false,
+          ),
           const Gap(16),
           TextButton(
             onPressed: () => Navigator.pop(context),
