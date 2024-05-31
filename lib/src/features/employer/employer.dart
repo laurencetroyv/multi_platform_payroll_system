@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 
+import 'package:payroll_system/src/common/common.dart';
 import 'package:payroll_system/src/features/authentication/authentication.dart';
 import 'package:payroll_system/src/features/employer/pages/pages.dart';
 import 'package:payroll_system/src/features/employer/providers/providers.dart';
@@ -29,44 +30,39 @@ class _DashboardState extends ConsumerState<EmployerDashboard> {
   ];
   int index = 0;
 
-  // final List _titles = [
-  //   '',
-  //   'Employees',
-  //   'Job Positions',
-  //   'Pay Salary',
-  //   'Check Cash Advance',
-  // ];
-
   @override
   Widget build(BuildContext context) {
-    final user = ref.read(authenticationProvider).asData?.value.user;
+    final user = ref.read(userControllerProvider);
+
     return Scaffold(
       appBar: AppBar(
         // title: Text(_titles[index]),
         actions: [
-          InkWell(
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('You have found a secret feature! 🎉'),
-                ),
-              );
-            },
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Icon(Icons.person),
-                const Gap(8),
-                Text(
-                  user?.name.split(" ")[0] ?? '',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
+          Padding(
+            padding: const EdgeInsets.only(right: 32),
+            child: InkWell(
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('You have found a secret feature! 🎉'),
                   ),
-                ),
-                const Gap(32),
-              ],
+                );
+              },
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Icon(Icons.person),
+                  const Gap(8),
+                  Text(
+                    user.name,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
             ),
           )
         ],
@@ -169,8 +165,8 @@ class _DashboardState extends ConsumerState<EmployerDashboard> {
                   Text('Log out'),
                 ],
               ),
-              onTap: () {
-                ref.read(authenticationProvider.notifier).logout();
+              onTap: () async {
+                await ref.read(authenticationProvider.notifier).logout();
                 WidgetsFlutterBinding.ensureInitialized()
                     .addPostFrameCallback((timeStamp) {
                   Navigator.pushNamedAndRemoveUntil(
