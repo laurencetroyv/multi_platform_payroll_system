@@ -26,44 +26,37 @@ class CashAdvanceDialog extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
+        const SizedBox(width: double.infinity),
         const ListTile(
           title: Text('Employee Details'),
         ),
-        const Gap(2),
         const Divider(),
-        const Gap(6),
         ListTile(
           title: const Text('Employee Name:'),
           subtitle: Text('${employee.firstName} ${employee.lastName}'),
         ),
-        const Gap(4),
         ListTile(
           title: const Text('Employee ID:'),
           subtitle: Text(employee.id),
         ),
-        const Gap(4),
         ListTile(
           title: const Text('Job Title:'),
           subtitle: Text(job),
         ),
-        const Gap(4),
         ListTile(
           title: const Text('Phone Number:'),
-          subtitle: Text(job),
+          subtitle: Text(cashAdvance.contactNumber),
         ),
-        const Gap(4),
-        ListTile(
-          title: const Text('Email Address:'),
-          subtitle: Text(job),
+        const ListTile(
+          title: Text('Email Address:'),
+          subtitle: Text("--"),
         ),
-        const Gap(16),
         const ListTile(
           title: Text('Cash Advance Detail'),
         ),
-        const Gap(2),
         const Divider(),
-        const Gap(6),
         ListTile(
           title: const Text('Amount Request:'),
           subtitle: Text('₱${cashAdvance.amount}'),
