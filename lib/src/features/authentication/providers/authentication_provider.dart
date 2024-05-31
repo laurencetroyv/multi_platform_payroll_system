@@ -7,6 +7,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:payroll_system/src/common/common.dart';
 import 'package:payroll_system/src/features/authentication/authentication.dart';
+import 'package:payroll_system/src/features/employer/employer.dart';
 
 part 'authentication_provider.g.dart';
 
@@ -53,10 +54,43 @@ class Authentication extends _$Authentication {
         ref.read(setSessionProvider("session", response.$id));
       }
 
+      final userEntity = UserEntity.fromJson(user.data, response.$id);
+
       final authState = AuthenticationEntity(
         isSignedIn: true,
-        user: UserEntity.fromJson(user.data),
+        user: userEntity,
       );
+
+      if (userEntity.role == UserRoles.employer) {
+        await ref
+            .read(jobControllerProvider.notifier)
+            .fetchJobPositions(userEntity);
+
+        await ref
+            .read(employeeControllerProvider.notifier)
+            .fetchEmployees(userEntity);
+
+        await ref
+            .read(cashAdvanceControllerProvider.notifier)
+            .fetchCashAdvanceEmployee(userEntity);
+
+        await ref
+            .read(paidControllerProvider.notifier)
+            .fetchPaidEmployees(userEntity);
+      } else {
+        final employee = await ref
+            .read(employeeControllerProvider.notifier)
+            .getEmployee(userEntity.id);
+
+        // fetch job of employee
+        await ref
+            .read(jobControllerProvider.notifier)
+            .fetchJobPositionEmployee(userEntity, employee: employee);
+        // fetch cash advances of employee
+        // fetch paids of employee
+      }
+
+      ref.read(userControllerProvider.notifier).setUser(userEntity);
 
       state = AsyncData(authState);
     } on AppwriteException catch (e) {
@@ -64,7 +98,7 @@ class Authentication extends _$Authentication {
     }
   }
 
-  Future<bool> signUp(SignUpFormEntity form) async {
+  Future<bool> signUp(SignUpFormEntity form, {String? name}) async {
     try {
       final account = ref.read(accountProvider);
       final database = ref.read(databasesProvider);
@@ -73,14 +107,14 @@ class Authentication extends _$Authentication {
         userId: ID.unique(),
         email: form.email,
         password: form.password,
-        name: form.name,
+        name: form.name.isNotEmpty ? form.name : name,
       );
 
       await database.createDocument(
         databaseId: EnvModel.database,
         collectionId: EnvModel.usersCollection,
         documentId: response.$id,
-        data: form.toJson(),
+        data: form.toJson(name: name),
       );
 
       return true;
@@ -104,19 +138,30 @@ class Authentication extends _$Authentication {
 
     final authState = AuthenticationEntity(
       isSignedIn: true,
-      user: UserEntity.fromJson(user.data),
+      user: UserEntity.fromJson(user.data, userSession.$id),
     );
 
     return authState;
   }
 
-  Future<void> logout() async {
-    final secureStorage = ref.read(secureStorageProvider);
-    final account = ref.read(accountProvider);
+  Future<List<EmployeeIds>> getEmployeeIds() async {
+    final database = ref.read(databasesProvider);
 
-    final sessionId = await secureStorage.read(key: 'session');
-    await account.deleteSession(sessionId: sessionId!);
-    secureStorage.delete(key: 'session');
+    final response = await database.listDocuments(
+      databaseId: EnvModel.database,
+      collectionId: EnvModel.employeeIdsCollection,
+    );
+
+    final employeeIds =
+        response.documents.map((e) => EmployeeIds.fromMap(e.data)).toList();
+
+    return employeeIds;
+  }
+
+  Future<void> logout() async {
+    final session = ref.read(userControllerProvider).session;
+    final account = ref.read(accountProvider);
+    await account.deleteSession(sessionId: session!);
 
     state = AsyncData(AuthenticationEntity(isSignedIn: false));
   }
