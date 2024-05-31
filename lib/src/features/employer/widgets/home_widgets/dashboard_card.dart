@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
+
+import 'package:payroll_system/src/common/common.dart';
 import 'package:payroll_system/src/features/employer/employer.dart';
 
 class DashboardCard extends ConsumerWidget {
@@ -27,6 +29,15 @@ class DashboardCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return InkWell(
       onTap: () {
+        final user = ref.read(userControllerProvider);
+        if (route == 4) {
+          ref
+              .read(cashAdvanceControllerProvider.notifier)
+              .fetchCashAdvanceEmployee(user);
+        } else if (route == 3) {
+          ref.read(paidControllerProvider.notifier).fetchPaidEmployees(user);
+        }
+
         ref.read(employerIndexProvider.notifier).setIndex(route);
       },
       child: Container(
