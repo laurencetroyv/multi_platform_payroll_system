@@ -1,3 +1,4 @@
+import 'package:appwrite/appwrite.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:payroll_system/src/common/common.dart';
@@ -13,10 +14,17 @@ class PaidController extends _$PaidController {
     return state.indexWhere((element) => element.id == id);
   }
 
-  void addPaidEmployee(PaymentEntity paymentEntity) {
+  Future<void> addPaidEmployee(PaymentEntity paymentEntity) async {
     final index = getIndex(paymentEntity.id);
     if (index == -1) {
       state.add(paymentEntity);
+      final database = ref.read(databasesProvider);
+      await database.createDocument(
+        databaseId: EnvModel.database,
+        collectionId: EnvModel.paymentsCollection,
+        documentId: ID.unique(),
+        data: paymentEntity.toJson(),
+      );
     }
   }
 
@@ -25,5 +33,21 @@ class PaidController extends _$PaidController {
     if (index != -1) {
       state.removeAt(index);
     }
+  }
+
+  Future<void> fetchPaidEmployees(UserEntity user) async {
+    final database = ref.read(databasesProvider);
+
+    final response = await database.listDocuments(
+      databaseId: EnvModel.database,
+      collectionId: EnvModel.paymentsCollection,
+      queries: [Query.equal('employerId', user.id)],
+    );
+
+    final payments = response.documents.map((payment) {
+      return PaymentEntity.fromMap(payment.data);
+    }).toList();
+
+    state = payments;
   }
 }

@@ -1,3 +1,4 @@
+import 'package:appwrite/appwrite.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:payroll_system/src/common/common.dart';
@@ -13,10 +14,30 @@ class EmployeeController extends _$EmployeeController {
     return state.indexWhere((e) => e.id == id);
   }
 
-  void addEmployee(EmployeeEntity employee) {
+  Future<void> addEmployee(EmployeeEntity employee) async {
     final index = employeeIndex(employee.id);
     if (index == -1) {
       state = [...state, employee];
+      final database = ref.read(databasesProvider);
+      final response = await database.createDocument(
+        databaseId: EnvModel.database,
+        collectionId: EnvModel.employeeCollection,
+        documentId: ID.unique(),
+        data: employee.toJson(),
+      );
+
+      final employeeId = EmployeeIds(
+        id: employee.id,
+        employerId: employee.employerId,
+        reference: response.$id,
+      );
+
+      await database.createDocument(
+        databaseId: EnvModel.database,
+        collectionId: EnvModel.employeeIdsCollection,
+        documentId: ID.unique(),
+        data: employeeId.toJson(),
+      );
     }
   }
 
@@ -32,5 +53,33 @@ class EmployeeController extends _$EmployeeController {
     if (index != -1) {
       state[index] = state[index].copyWith(status: !employee.status);
     }
+  }
+
+  Future<void> fetchEmployees(UserEntity user) async {
+    final database = ref.read(databasesProvider);
+
+    final response = await database.listDocuments(
+      databaseId: EnvModel.database,
+      collectionId: EnvModel.employeeCollection,
+      queries: [Query.equal('employerId', user.id)],
+    );
+
+    final employees = response.documents.map((employee) {
+      return EmployeeEntity.fromMap(employee.data);
+    }).toList();
+
+    state = employees;
+  }
+
+  Future<EmployeeEntity> getEmployee(String id) async {
+    final database = ref.read(databasesProvider);
+
+    final response = await database.getDocument(
+      databaseId: EnvModel.database,
+      collectionId: EnvModel.employeeCollection,
+      documentId: id,
+    );
+
+    return EmployeeEntity.fromMap(response.data);
   }
 }
