@@ -4,9 +4,12 @@ import 'package:appwrite/appwrite.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
+import 'package:intl/intl.dart';
 
 import 'package:payroll_system/src/common/common.dart';
 import 'package:payroll_system/src/features/authentication/authentication.dart';
+import 'package:payroll_system/src/features/employee/provider/employee_provider.dart';
+import 'package:payroll_system/src/features/employer/employer.dart';
 
 class RequestCashAdvance extends ConsumerStatefulWidget {
   const RequestCashAdvance({super.key});
@@ -28,9 +31,10 @@ class _RequestCashAdvanceState extends ConsumerState<RequestCashAdvance> {
   void initState() {
     super.initState();
     final user = ref.read(authenticationProvider).value!.user!;
+    final job = ref.read(jobControllerProvider).first;
     nameController.text = user.name;
-    employeeIDController.text = user.id;
-    // positionController.text = user.job ?? 'Employer';
+    employeeIDController.text = user.employeeId!;
+    positionController.text = job.title;
     emailAddressController.text = user.email;
   }
 
@@ -88,6 +92,7 @@ class _RequestCashAdvanceState extends ConsumerState<RequestCashAdvance> {
           const Gap(16),
           TextFormField(
             controller: phoneNumberController,
+            maxLength: 11,
             keyboardType: TextInputType.number,
             decoration: const InputDecoration(
               labelText: "Phone Number",
@@ -110,6 +115,7 @@ class _RequestCashAdvanceState extends ConsumerState<RequestCashAdvance> {
           TextFormField(
             controller: amountRequestedController,
             keyboardType: TextInputType.number,
+            maxLength: 7,
             decoration: const InputDecoration(
               labelText: "Amount Requested",
               border: OutlineInputBorder(),
@@ -122,6 +128,17 @@ class _RequestCashAdvanceState extends ConsumerState<RequestCashAdvance> {
               labelText: "Repayment Schedule",
               border: OutlineInputBorder(),
             ),
+            onTap: () {
+              showDatePicker(
+                context: context,
+                initialDate: DateTime.now(),
+                firstDate: DateTime.now(),
+                lastDate: DateTime.now().add(const Duration(days: 365)),
+              ).then((value) {
+                final date = DateFormat('yyyy-MM-dd').format(value!);
+                repaymentScheduleController.text = date;
+              });
+            },
           ),
           const Gap(64),
           Row(
@@ -129,19 +146,22 @@ class _RequestCashAdvanceState extends ConsumerState<RequestCashAdvance> {
               Expanded(
                 child: ElevatedButton(
                   onPressed: () async {
-                    final database = ref.read(databasesProvider);
+                    final employee = ref.read(employeeProvider);
 
-                    await database.createDocument(
-                      databaseId: EnvModel.database,
-                      collectionId: EnvModel.cashAdvanceCollection,
-                      documentId: ID.unique(),
-                      data: {
-                        'users': employeeIDController.text,
-                        'phoneNumber': phoneNumberController.text,
-                        'amountRequested': amountRequestedController.text,
-                        'repaymentSchedule': repaymentScheduleController.text,
-                      },
+                    final cashAdvance = CashAdvanceEntity(
+                      id: ID.unique(),
+                      employeeId: employee.id,
+                      amount: amountRequestedController.text,
+                      repaymentDate:
+                          DateTime.parse(repaymentScheduleController.text),
+                      createdAt: DateTime.now(),
+                      employerId: employee.employerId,
+                      contactNumber: phoneNumberController.text,
                     );
+
+                    await ref
+                        .read(cashAdvanceControllerProvider.notifier)
+                        .postCashAdvanceEmployee(cashAdvance);
 
                     WidgetsFlutterBinding.ensureInitialized()
                         .addPostFrameCallback((_) {

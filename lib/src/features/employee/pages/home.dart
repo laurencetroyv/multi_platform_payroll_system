@@ -5,6 +5,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 
+import 'package:payroll_system/src/features/employee/provider/employee_index.dart';
+
 class Home extends ConsumerWidget {
   const Home({super.key});
 
@@ -34,21 +36,21 @@ class Home extends ConsumerWidget {
           const DashboardCard(
             icon: 'assets/svgs/account.svg',
             title: "Employee Dashboard",
-            onTap: "employee-information",
+            index: 1,
             color: Color(0xFF2196F2),
           ),
           const Gap(24),
           const DashboardCard(
             icon: 'assets/svgs/check.svg',
             title: "You have been paid!",
-            onTap: "payment-details",
+            index: 2,
             color: Color(0xFF49B04A),
           ),
           const Gap(24),
           const DashboardCard(
             icon: 'assets/svgs/money.svg',
             title: "Request Cash Advance",
-            onTap: "request-cash-advance",
+            index: 3,
             color: Color(0xFFEFA001),
           ),
         ],
@@ -62,19 +64,19 @@ class DashboardCard extends ConsumerWidget {
     super.key,
     required this.icon,
     required this.title,
-    required this.onTap,
+    required this.index,
     required this.color,
   });
 
   final String icon;
   final String title;
-  final String onTap;
+  final int index;
   final Color color;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return InkWell(
-      onTap: () => Navigator.pushNamed(context, onTap),
+      onTap: () => ref.read(employeeIndexProvider.notifier).setIndex(index),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
