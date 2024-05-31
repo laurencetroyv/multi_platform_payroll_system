@@ -1,18 +1,23 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 
+import 'package:payroll_system/src/common/common.dart';
 import 'package:payroll_system/src/features/authentication/authentication.dart';
 
 class SignUpMobileView extends ConsumerStatefulWidget {
-  const SignUpMobileView({
+  const SignUpMobileView(
+    this.ids, {
     super.key,
     required SignUpFormEntity form,
   }) : _form = form;
 
   final SignUpFormEntity _form;
+  final List<EmployeeIds> ids;
 
   @override
   ConsumerState<SignUpMobileView> createState() => _MobileViewState();
@@ -23,6 +28,9 @@ class _MobileViewState extends ConsumerState<SignUpMobileView> {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 400 ||
+        (Platform.isAndroid || Platform.isIOS);
+
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -40,12 +48,23 @@ class _MobileViewState extends ConsumerState<SignUpMobileView> {
           const Gap(28),
           Image.asset('assets/images/illustration.png'),
           const Gap(64),
+          if (!isMobile)
+            TextFormField(
+              controller: widget._form.nameController,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Name',
+                hintText: 'Enter your name',
+              ),
+            ),
+          const Gap(16),
           TextFormField(
-            controller: widget._form.nameController,
+            autovalidateMode: AutovalidateMode.disabled,
+            controller: widget._form.employeeId,
             decoration: const InputDecoration(
               border: OutlineInputBorder(),
-              labelText: 'Name',
-              hintText: 'Enter your name',
+              labelText: 'Employee ID',
+              hintText: 'Employee ID must came from HR Department',
             ),
           ),
           const Gap(16),
@@ -78,7 +97,7 @@ class _MobileViewState extends ConsumerState<SignUpMobileView> {
             obscureText: !showPassword,
           ),
           const Gap(64),
-          SignUpBtn("\t\tSign up\t\t", form: widget._form),
+          SignUpBtn("\t\tSign up\t\t", form: widget._form, ids: widget.ids),
           const Gap(16),
           TextButton(
             onPressed: () => Navigator.pop(context),

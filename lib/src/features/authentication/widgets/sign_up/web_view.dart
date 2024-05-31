@@ -3,15 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
+import 'package:payroll_system/src/common/common.dart';
 import 'package:payroll_system/src/features/authentication/authentication.dart';
 
 class SignUpWebView extends ConsumerStatefulWidget {
-  const SignUpWebView({
+  const SignUpWebView(
+    this.ids, {
     super.key,
     required SignUpFormEntity form,
   }) : _form = form;
 
   final SignUpFormEntity _form;
+  final List<EmployeeIds> ids;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _WebViewState();
@@ -65,6 +68,16 @@ class _WebViewState extends ConsumerState<SignUpWebView> {
                   ),
                   const Gap(16),
                   TextFormField(
+                    autovalidateMode: AutovalidateMode.disabled,
+                    controller: widget._form.employeeId,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Employee ID',
+                      hintText: 'Employee ID must came from HR Department',
+                    ),
+                  ),
+                  const Gap(16),
+                  TextFormField(
                     controller: widget._form.emailController,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
@@ -98,7 +111,11 @@ class _WebViewState extends ConsumerState<SignUpWebView> {
                   Center(
                     child: SizedBox(
                       width: 215,
-                      child: SignUpBtn("Register", form: widget._form),
+                      child: SignUpBtn(
+                        "Register",
+                        form: widget._form,
+                        ids: widget.ids,
+                      ),
                     ),
                   ),
                   const Gap(12),
