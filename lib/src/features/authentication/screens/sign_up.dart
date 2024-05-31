@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:payroll_system/src/common/common.dart';
 import 'package:payroll_system/src/features/authentication/authentication.dart';
 
 class SignUp extends ConsumerStatefulWidget {
@@ -25,11 +26,24 @@ class _SignUpState extends ConsumerState<SignUp> {
         automaticallyImplyLeading: false,
         elevation: kIsWeb || Platform.isWindows ? 256 : null,
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: kIsWeb || Platform.isWindows
-            ? SignUpWebView(form: _form)
-            : SignUpMobileView(form: _form),
+      body: FutureBuilder(
+        future: ref.read(authenticationProvider.notifier).getEmployeeIds(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          final ids = snapshot.data as List<EmployeeIds>;
+
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: kIsWeb || Platform.isWindows
+                ? SignUpWebView(ids, form: _form)
+                : SignUpMobileView(ids, form: _form),
+          );
+        },
       ),
     );
   }
