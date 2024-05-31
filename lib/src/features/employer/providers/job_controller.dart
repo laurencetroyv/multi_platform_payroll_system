@@ -44,17 +44,16 @@ class JobController extends _$JobController {
     state = jobs;
   }
 
-  Future<JobEntity> fetchJobPositionEmployee(UserEntity user,
-      {EmployeeEntity? employee}) async {
+  Future<JobEntity> fetchJobPositionEmployee(EmployeeEntity employee) async {
     final database = ref.read(databasesProvider);
 
     final response = await database.listDocuments(
       databaseId: EnvModel.database,
       collectionId: EnvModel.jobPositionsCollection,
       queries: [
-        Query.or([
-          Query.equal('employerId', user.id),
-          Query.equal('id', employee?.jobId)
+        Query.and([
+          Query.equal('employerId', employee.employerId),
+          Query.equal('id', employee.jobId)
         ])
       ],
     );
@@ -62,6 +61,8 @@ class JobController extends _$JobController {
     final jobs = response.documents.map((job) {
       return JobEntity.fromMap(job.data);
     }).toList();
+
+    state = jobs;
 
     return jobs.first;
   }

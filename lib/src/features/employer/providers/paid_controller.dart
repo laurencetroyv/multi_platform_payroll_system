@@ -50,4 +50,26 @@ class PaidController extends _$PaidController {
 
     state = payments;
   }
+
+  Future<void> fetchPaidEmployeesEmployee(EmployeeEntity employee) async {
+    try {
+      final database = ref.read(databasesProvider);
+
+      final response = await database.listDocuments(
+        databaseId: EnvModel.database,
+        collectionId: EnvModel.paymentsCollection,
+        queries: [
+          Query.equal('employeeId', employee.id),
+        ],
+      );
+
+      final payments = response.documents.map((payment) {
+        return PaymentEntity.fromMap(payment.data);
+      }).toList();
+
+      state = payments;
+    } on AppwriteException catch (e) {
+      throw Exception(e.message);
+    }
+  }
 }
