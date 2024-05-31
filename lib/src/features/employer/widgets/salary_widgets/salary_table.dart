@@ -54,7 +54,7 @@ class _SalaryTableState extends ConsumerState<SalaryTable> {
                   final now = DateTime.now();
                   final isPaid = paidEmployees
                       .where((paid) =>
-                          paid.userId == employee.id &&
+                          paid.employeeId == employee.id &&
                           paid.createdAt.month == now.month)
                       .isNotEmpty;
 
@@ -67,15 +67,16 @@ class _SalaryTableState extends ConsumerState<SalaryTable> {
                       DataCell(Text(isPaid ? 'Paid' : 'Unpaid')),
                       DataCell(
                         FilledButton(
-                          onPressed: () {
+                          onPressed: () async {
                             final paymentEntity = PaymentEntity(
                               id: employee.id,
                               status: true,
-                              userId: employee.id,
+                              employeeId: employee.id,
                               createdAt: DateTime.now(),
+                              employerId: employee.employerId,
                             );
 
-                            ref
+                            await ref
                                 .read(paidControllerProvider.notifier)
                                 .addPaidEmployee(paymentEntity);
                             setState(() {});

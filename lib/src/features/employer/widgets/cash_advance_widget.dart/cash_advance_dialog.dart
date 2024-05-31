@@ -15,7 +15,7 @@ class CashAdvanceDialog extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final employee = ref
         .watch(employeeControllerProvider)
-        .where((e) => e.id == cashAdvance.userId)
+        .where((e) => e.id == cashAdvance.employeeId)
         .first;
 
     final job = ref
