@@ -66,7 +66,7 @@ class _AddEmployeeFormState extends ConsumerState<AddJobForm> {
           const Gap(16),
           const Gap(16),
           FilledButton(
-            onPressed: () {
+            onPressed: () async {
               if (_formKey.currentState!.validate()) {
                 final key = UniqueKey().toString();
                 final job = JobEntity(
@@ -74,15 +74,21 @@ class _AddEmployeeFormState extends ConsumerState<AddJobForm> {
                   title: _nameController.text,
                   monthlySalary: double.parse(_salaryController.text),
                   isActive: true,
+                  employerId: ref.read(userControllerProvider).id,
                 );
                 if (_id == null) {
-                  ref.read(jobControllerProvider.notifier).addJobPosition(job);
+                  await ref
+                      .read(jobControllerProvider.notifier)
+                      .addJobPosition(job);
                 } else {
                   ref
                       .read(jobControllerProvider.notifier)
                       .updateJobPosition(job);
                 }
-                Navigator.of(context).pop();
+
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  Navigator.of(context).pop();
+                });
               }
             },
             style: ButtonStyle(
