@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 
 import 'package:appwrite/appwrite.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:payroll_system/src/common/common.dart';
@@ -14,24 +15,25 @@ part 'authentication_provider.g.dart';
 
 @Riverpod(keepAlive: true)
 class Authentication extends _$Authentication {
+  final _secureStorage = const FlutterSecureStorage();
+
   @override
   FutureOr<AuthenticationEntity> build() async {
     state = const AsyncLoading();
 
-    final session = ref.read(readSessionProvider).value;
+    final session = await _secureStorage.read(key: 'session');
 
     if (session != null && session.isNotEmpty) {
-      final user = await getUser(session);
-      state = AsyncData(user);
-      return user;
-    } else {
-      final user = AuthenticationEntity.init();
-      state = AsyncData(user);
-      return user;
+      final account = ref.read(accountProvider);
+      await account.deleteSession(sessionId: session);
     }
+
+    final user = AuthenticationEntity.init();
+    state = AsyncData(user);
+    return user;
   }
 
-  Future<void> login(SignInFormEntity form) async {
+  Future<AuthenticationEntity?> login(SignInFormEntity form) async {
     try {
       final account = ref.read(accountProvider);
       final database = ref.read(databasesProvider);
@@ -51,8 +53,8 @@ class Authentication extends _$Authentication {
 
       if ((kIsWeb || Platform.isWindows && form.saveSession == true) ||
           (Platform.isAndroid || Platform.isIOS)) {
-        ref.read(deleteSessionProvider('session'));
-        ref.read(setSessionProvider("session", response.$id));
+        await _secureStorage.delete(key: "session");
+        await _secureStorage.write(key: "session", value: response.$id);
       }
 
       final userEntity = UserEntity.fromJson(user.data, response.$id);
@@ -109,10 +111,15 @@ class Authentication extends _$Authentication {
 
       ref.read(userControllerProvider.notifier).setUser(userEntity);
 
-      state = AsyncData(authState);
+      return authState;
     } on AppwriteException catch (e) {
-      Exception(e.message);
+      state = AsyncError(e, StackTrace.current);
+      return null;
     }
+  }
+
+  void setState(AuthenticationEntity entity) {
+    state = AsyncData(entity);
   }
 
   Future<bool> signUp(SignUpFormEntity form, {String? name}) async {

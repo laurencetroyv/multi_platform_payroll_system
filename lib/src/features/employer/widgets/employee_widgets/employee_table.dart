@@ -18,6 +18,7 @@ class _EmployeeTableState extends ConsumerState<EmployeeTable> {
   Widget build(BuildContext context) {
     final employees = ref.watch(employeeControllerProvider);
     final jobs = ref.watch(jobControllerProvider);
+    final cashAdvanced = ref.watch(cashAdvanceControllerProvider);
 
     return Expanded(
       child: Center(
@@ -44,6 +45,9 @@ class _EmployeeTableState extends ConsumerState<EmployeeTable> {
                   DataColumn(label: Text('Last Name')),
                   DataColumn(label: Text('Address')),
                   DataColumn(label: Text('Job Title')),
+                  DataColumn(label: Text('Salary')),
+                  DataColumn(label: Text('Cash Adv.')),
+                  DataColumn(label: Text('Netpay')),
                   DataColumn(label: Text('Status')),
                   DataColumn(label: Text('Action')),
                 ],
@@ -52,13 +56,29 @@ class _EmployeeTableState extends ConsumerState<EmployeeTable> {
                   final jobName =
                       jobs.where((job) => job.id == employee.jobId).first;
 
+                  final cashAdvance = cashAdvanced
+                      .where((cashAdvances) =>
+                          cashAdvances.employeeId == employee.id &&
+                          cashAdvances.active)
+                      .toList();
+
+                  final netPay = jobName.monthlySalary -
+                      (cashAdvance.isNotEmpty
+                          ? double.parse(cashAdvance.first.amount)
+                          : 0);
+
                   return DataRow(
                     cells: [
                       DataCell(Text(employee.id)),
                       DataCell(Text(employee.firstName)),
                       DataCell(Text(employee.lastName)),
-                      DataCell(Text(employee.address)),
+                      DataCell(Text('${employee.address.substring(0, 10)}...')),
                       DataCell(Text(jobName.title)),
+                      DataCell(Text(jobName.monthlySalary.toString())),
+                      DataCell(Text(cashAdvance.isNotEmpty
+                          ? cashAdvance.first.amount.toString()
+                          : '-')),
+                      DataCell(Text(netPay.toString())),
                       DataCell(Text(employee.status ? 'Active' : 'Inactive')),
                       DataCell(
                         FilledButton(

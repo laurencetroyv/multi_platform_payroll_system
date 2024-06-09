@@ -63,4 +63,15 @@ class CashAdvanceController extends _$CashAdvanceController {
 
     state = cashAdvance;
   }
+
+  Future<void> approveCashAdvanced(String id) async {
+    final database = ref.read(databasesProvider);
+
+    await database.updateDocument(
+      databaseId: EnvModel.database,
+      collectionId: EnvModel.cashAdvanceCollection,
+      documentId: id,
+      data: {'active': true},
+    );
+  }
 }

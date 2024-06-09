@@ -6,6 +6,7 @@ class CashAdvanceEntity {
   final DateTime createdAt;
   final String employerId;
   final String contactNumber;
+  final bool active;
 
   CashAdvanceEntity({
     required this.id,
@@ -15,6 +16,7 @@ class CashAdvanceEntity {
     required this.createdAt,
     required this.employerId,
     required this.contactNumber,
+    required this.active,
   });
 
   Map<String, dynamic> toJson() {
@@ -37,6 +39,7 @@ class CashAdvanceEntity {
       createdAt: DateTime.parse(json['\$createdAt']),
       employerId: json['employerId'],
       contactNumber: json['contactNumber'],
+      active: json['active'],
     );
   }
 }

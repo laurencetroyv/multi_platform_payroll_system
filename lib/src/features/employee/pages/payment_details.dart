@@ -19,6 +19,13 @@ class PaymentDetails extends ConsumerWidget {
         .where((element) => element.createdAt.month == DateTime.now().month)
         .length;
 
+    final cashAdvanced = ref
+        .read(cashAdvanceControllerProvider)
+        .where((element) => element.repaymentDate.month >= DateTime.now().month)
+        .toList();
+
+    final hasCashAdvanced = cashAdvanced.isNotEmpty;
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -44,10 +51,35 @@ class PaymentDetails extends ConsumerWidget {
               title: const Text("Payment Date:"),
               subtitle: Text(user.name),
             ),
+            if (hasCashAdvanced) const Gap(28),
+            if (hasCashAdvanced)
+              ListTile(
+                title: const Text("Cash Advanced Status"),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('You have cash advanced this month'),
+                    Text(
+                      'Total Cash Advanced: ${cashAdvanced.fold<double>(0, (previousValue, element) => previousValue + double.parse(element.amount))}',
+                    ),
+                  ],
+                ),
+              ),
             const Gap(28),
             ListTile(
-              title: const Text("Payment Amount:"),
-              subtitle: Text("${job.monthlySalary}"),
+              title: const Text("Salary Amount:"),
+              subtitle: hasCashAdvanced
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Salary: ${job.monthlySalary}"),
+                        Text(
+                            'Deduction Amount: ${cashAdvanced.fold<double>(0, (previousValue, element) => previousValue + double.parse(element.amount))}'),
+                        Text(
+                            "Total Netpay: ${job.monthlySalary - cashAdvanced.fold<double>(0, (previousValue, element) => previousValue + double.parse(element.amount))}")
+                      ],
+                    )
+                  : Text("${job.monthlySalary}"),
             ),
             const Gap(28),
             ListTile(

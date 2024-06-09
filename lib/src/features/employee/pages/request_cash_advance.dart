@@ -157,6 +157,7 @@ class _RequestCashAdvanceState extends ConsumerState<RequestCashAdvance> {
                       createdAt: DateTime.now(),
                       employerId: employee.employerId,
                       contactNumber: phoneNumberController.text,
+                      active: false,
                     );
 
                     await ref

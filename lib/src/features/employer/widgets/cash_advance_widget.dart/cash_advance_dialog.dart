@@ -7,15 +7,20 @@ import 'package:intl/intl.dart';
 import 'package:payroll_system/src/common/common.dart';
 import 'package:payroll_system/src/features/employer/employer.dart';
 
-class CashAdvanceDialog extends ConsumerWidget {
+class CashAdvanceDialog extends ConsumerStatefulWidget {
   const CashAdvanceDialog(this.cashAdvance, {super.key});
   final CashAdvanceEntity cashAdvance;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CashAdvanceDialog> createState() => _CashAdvanceDialogState();
+}
+
+class _CashAdvanceDialogState extends ConsumerState<CashAdvanceDialog> {
+  @override
+  Widget build(BuildContext context) {
     final employee = ref
         .watch(employeeControllerProvider)
-        .where((e) => e.id == cashAdvance.employeeId)
+        .where((e) => e.id == widget.cashAdvance.employeeId)
         .first;
 
     final job = ref
@@ -23,14 +28,29 @@ class CashAdvanceDialog extends ConsumerWidget {
         .where((j) => j.id == employee.jobId)
         .first
         .title;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         const SizedBox(width: double.infinity),
-        const ListTile(
-          title: Text('Employee Details'),
+        ListTile(
+          trailing: FilledButton(
+            onPressed: widget.cashAdvance.active
+                ? null
+                : () async {
+                    await ref
+                        .read(cashAdvanceControllerProvider.notifier)
+                        .approveCashAdvanced(widget.cashAdvance.id);
+
+                    setState(() {});
+                  },
+            child: Text(!widget.cashAdvance.active
+                ? 'Approve Cash Advance'
+                : 'Approved'),
+          ),
+          title: const Text('Employee Details'),
         ),
         const Divider(),
         ListTile(
@@ -47,7 +67,7 @@ class CashAdvanceDialog extends ConsumerWidget {
         ),
         ListTile(
           title: const Text('Phone Number:'),
-          subtitle: Text(cashAdvance.contactNumber),
+          subtitle: Text(widget.cashAdvance.contactNumber),
         ),
         const ListTile(
           title: Text('Email Address:'),
@@ -59,12 +79,13 @@ class CashAdvanceDialog extends ConsumerWidget {
         const Divider(),
         ListTile(
           title: const Text('Amount Request:'),
-          subtitle: Text('₱${cashAdvance.amount}'),
+          subtitle: Text('₱${widget.cashAdvance.amount}'),
         ),
         const Gap(4),
         ListTile(
           title: const Text('Repayment Schedule:'),
-          subtitle: Text(DateFormat.yMMMd().format(cashAdvance.repaymentDate)),
+          subtitle:
+              Text(DateFormat.yMMMd().format(widget.cashAdvance.repaymentDate)),
         ),
       ],
     );

@@ -18,7 +18,11 @@ class DashboardCardContainer extends ConsumerWidget {
     final paidController = ref.watch(paidControllerProvider).length;
     final cashAdvanceController =
         ref.watch(cashAdvanceControllerProvider).length;
-    final employeeController = ref.watch(employeeControllerProvider).length;
+    final employeeController = ref
+        .watch(employeeControllerProvider)
+        .map((e) => e.status)
+        .where((e) => e)
+        .length;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,

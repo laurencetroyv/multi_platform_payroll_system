@@ -35,8 +35,18 @@ class _MainAppState extends ConsumerState<MainApp> {
           route = routes.getRoutes(type: userRole);
         });
       },
-      error: (error, stackTrace) {},
-      loading: () {},
+      error: (error, stackTrace) {
+        final routes = Routes(signedIn: false);
+        setState(() {
+          route = routes.getRoutes();
+        });
+      },
+      loading: () {
+        final routes = Routes(signedIn: false);
+        setState(() {
+          route = routes.getRoutes();
+        });
+      },
     );
 
     return SafeArea(
